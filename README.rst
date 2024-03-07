@@ -69,3 +69,44 @@ License
 =======
 
 GNU General Public License version 2.0, according to the license in Linux kernel.
+
+Easy instruction to work with DKMS
+==================================
+
+DKMS - Dynamic Kernel Module Support is easy for installing or updating external modules.
+`<https://github.com/dell/dkms>`_
+
+This instruction is for Debian/Ubuntu. You need to make your arrangement for the other Linux
+distribution you use, especially for module signing.
+
+These distributions provide the ``dkms`` package in their official repository. Install it at first.
+
+::
+
+    $ sudo apt-get install dkms
+
+
+Then one of ``linux-headers`` packages is required to make the kernel modules for the running
+kernel. For example, if the running kernel is ``linux-generic``, it should be
+``linux-headers-generic``.
+
+::
+
+ $ sudo apt-get install linux-headers-generic
+
+When building and installing the kernel modules, execute the following commands.
+
+::
+
+    $ git clone `<https://github.com/takaswie/linux-firewire-dkms.git>`_
+    $ cd linux-firewire-dkms
+    $ sudo ln -s $(pwd) /usr/src/linux-firewire-6.8
+    $ sudo dkms install linux-firewire/6.8 --force
+
+When uninstalling and remove the kernel modules, execute the following commands.
+
+::
+
+    $ sudo dkms remove linux-firewire/6.8 --all
+    $ sudo rm /usr/src/linux-firewire-6.8
+    $ rm -r snd-firewire-improve
