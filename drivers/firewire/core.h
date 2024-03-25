@@ -274,4 +274,12 @@ static inline bool is_in_fcp_region(u64 offset, size_t length)
 		offset + length <= (CSR_REGISTER_BASE | CSR_FCP_END);
 }
 
+// Tracepoints events. This is just for debugging purpose, thus not put to any UAPI.
+
+enum fw_trace_bus_reset_issue {
+	FW_TRACE_BUS_RESET_ISSUE_INITIATE = 0,
+	FW_TRACE_BUS_RESET_ISSUE_SCHEDULE,
+	FW_TRACE_BUS_RESET_ISSUE_POSTPONE,
+};
+
 #endif /* _FIREWIRE_CORE_H */
