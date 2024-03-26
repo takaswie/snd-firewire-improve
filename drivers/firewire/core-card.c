@@ -224,20 +224,12 @@ static int reset_bus(struct fw_card *card, bool short_reset)
 
 	trace_bus_reset(FW_TRACE_BUS_RESET_ISSUE_INITIATE, short_reset);
 
-	if (unlikely(fw_core_param_debug & FW_CORE_PARAM_DEBUG_BUSRESETS))
-		fw_notice(card, "initiating %s bus reset\n",
-		          short_reset ? "short" : "long");
-
 	return card->driver->update_phy_reg(card, reg, 0, bit);
 }
 
 void fw_schedule_bus_reset(struct fw_card *card, bool delayed, bool short_reset)
 {
 	trace_bus_reset(FW_TRACE_BUS_RESET_ISSUE_SCHEDULE, short_reset);
-
-	if (unlikely(fw_core_param_debug & FW_CORE_PARAM_DEBUG_BUSRESETS))
-		fw_notice(card, "scheduling %s bus reset\n",
-		          short_reset ? "short" : "long");
 
 	/* We don't try hard to sort out requests of long vs. short resets. */
 	card->br_short = short_reset;
@@ -259,8 +251,6 @@ static void br_work(struct work_struct *work)
 	    time_before64(get_jiffies_64(), card->reset_jiffies + 2 * HZ)) {
 		trace_bus_reset(FW_TRACE_BUS_RESET_ISSUE_POSTPONE, card->br_short);
 
-		if (unlikely(fw_core_param_debug & FW_CORE_PARAM_DEBUG_BUSRESETS))
-			fw_notice(card, "delaying bus reset\n");
 		if (!queue_delayed_work(fw_workqueue, &card->br_work, 2 * HZ))
 			fw_card_put(card);
 		return;
