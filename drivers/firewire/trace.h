@@ -14,7 +14,8 @@
 	__print_symbolic(issue,						\
 		{FW_TRACE_BUS_RESET_ISSUE_INITIATE, "Initiate" },	\
 		{FW_TRACE_BUS_RESET_ISSUE_SCHEDULE, "Schedule" },	\
-		{FW_TRACE_BUS_RESET_ISSUE_POSTPONE, "Postpone" })
+		{FW_TRACE_BUS_RESET_ISSUE_POSTPONE, "Postpone" },	\
+		{FW_TRACE_BUS_RESET_ISSUE_DETECT, "Detect" })
 
 TRACE_EVENT(bus_reset,
 	TP_PROTO(enum fw_trace_bus_reset_issue issue, bool short_reset),

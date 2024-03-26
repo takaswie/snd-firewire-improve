@@ -39,6 +39,7 @@
 #endif
 
 #include "core.h"
+#include "trace.h"
 #include "ohci.h"
 
 #define ohci_info(ohci, f, args...)	dev_info(ohci->card.device, f, ##args)
@@ -2060,7 +2061,7 @@ static void bus_reset_work(struct work_struct *work)
 
 	ohci->generation = generation;
 	reg_write(ohci, OHCI1394_IntEventClear, OHCI1394_busReset);
-	if (param_debug & OHCI_PARAM_DEBUG_BUSRESETS)
+	if ((param_debug & OHCI_PARAM_DEBUG_BUSRESETS) || trace_bus_reset_enabled())
 		reg_write(ohci, OHCI1394_IntMaskSet, OHCI1394_busReset);
 
 	if (ohci->quirks & QUIRK_RESET_PACKET)
@@ -2133,8 +2134,11 @@ static irqreturn_t irq_handler(int irq, void *data)
 	reg_write(ohci, OHCI1394_IntEventClear,
 		  event & ~(OHCI1394_busReset | OHCI1394_postedWriteErr));
 	log_irqs(ohci, event);
-	if (event & OHCI1394_busReset)
+	if (event & OHCI1394_busReset) {
+		// It is not possible to detect whether the bus reset issued for short reset or not.
+		trace_bus_reset(FW_TRACE_BUS_RESET_ISSUE_DETECT, 0);
 		reg_write(ohci, OHCI1394_IntMaskClear, OHCI1394_busReset);
+	}
 
 	if (event & OHCI1394_selfIDComplete)
 		queue_work(selfid_workqueue, &ohci->bus_reset_work);
@@ -2473,7 +2477,7 @@ static int ohci_enable(struct fw_card *card,
 		OHCI1394_unrecoverableError |
 		OHCI1394_cycleTooLong |
 		OHCI1394_masterIntEnable;
-	if (param_debug & OHCI_PARAM_DEBUG_BUSRESETS)
+	if ((param_debug & OHCI_PARAM_DEBUG_BUSRESETS) || trace_bus_reset_enabled())
 		irqs |= OHCI1394_busReset;
 	reg_write(ohci, OHCI1394_IntMaskSet, irqs);
 
